@@ -123,6 +123,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "health-patterns-ui"
+    }
+  },
+  "defaultProject": "health-patterns-ui",
+  "cli": {
+    "analytics": "74d0658d-31b0-4323-8afe-9027eed280c7"
+  }
 }
