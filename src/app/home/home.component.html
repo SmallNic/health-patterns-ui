@@ -1,3 +1,31 @@
-<p>Hello World</p>
+<div class="row">
+  <div class="col">
+    <div class="jumbotron">
+      <div id="fitbit-images"><img src="../../assets/images/fitbit-image.png"></div>
+      <h1 class="display-3">Welcome!</h1>
+      <p class="lead"><em>My Health Patterns is a quick and easy way to identify patterns based on data from my FitBit.</em></p>
+      <hr class="my-4">
+      <p>To get started check any of the buttons below to plot that data. <em>(Current data is from June 2020)</em></p>
+      <form>
+        <fieldset class="form-group">
+          <legend>Datasets</legend>
+          <div class="row">
+            <div class="col-sm" *ngFor="let dataset of datasets">
+              <div class="form-check" >
+                <label class="form-check-label">
+                  <input type="radio" class="form-check-input" name="optionsRadios" id="{{dataset.displayName}}"
+                    value="{{dataset.displayName}}" (click)="selectDataset(dataset)">
+                  {{dataset.displayName}}
+                </label>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</div>
 
-<div id="chartContainer" style="height: 370px; width: 50%; margin-left:auto;margin-right:auto;"></div>
+
+
+<div id="chartContainer" style="height: 370px; width: 75%; margin-left:auto;margin-right:auto;"></div>
