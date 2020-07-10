@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-// import { catch, do, map } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 
@@ -10,22 +9,15 @@ import { environment } from '../../environments/environment';
 export class HealthDataService {
 
   constructor(
-    private _http: HttpClient,
+    private http: HttpClient,
   ){ }
 
-  getActivityData(): Observable<any> {
-    return this._http.get<any>(environment.activityDataURL);
-      // .catch(this.handleError);
+  public getActivityData(): Observable<any> {
+    return this.http.get<any>(environment.activityDataURL);
   }
 
-  getSleepData(): Observable<any> {
-    return this._http.get<any>(environment.sleepDataURL);
-      // .catch(this.handleError);
+  public getSleepData(): Observable<any> {
+    return this.http.get<any>(environment.sleepDataURL);
   }
 
-
-  // private handleError( err:HttpErrorResponse ){
-  //   console.log( err.message );
-  //   return Observable.throw( err.message );
-  // }
 }

@@ -1,20 +1,25 @@
 <div class="row">
   <div class="col">
     <div class="jumbotron">
-      <div id="fitbit-images"><img src="../../assets/images/fitbit-image.png"></div>
-      <h1 class="display-3">Welcome!</h1>
-      <p class="lead"><em>My Health Patterns is a quick and easy way to identify patterns based on data from my FitBit.</em></p>
+      <!-- <h1 class="display-3">Welcome!</h1> -->
+      <p class="lead">
+        <em>I created Health Insights to help me use my Fitbit data to identify any patterns in my health.
+          I was particularly interested in my sleep quality in relation to my daily activity level.</em>
+      </p>
       <hr class="my-4">
-      <p>To get started check any of the buttons below to plot that data. <em>(Current data is from June 2020)</em></p>
+      <p>To get started, select one of the activity datasets below to plot that data.
+        <em>(Current data is from June 2020)</em>
+      </p>
+
       <form>
         <fieldset class="form-group">
-          <legend>Datasets</legend>
+          <legend>Activity Datasets</legend>
           <div class="row">
-            <div class="col-sm" *ngFor="let dataset of datasets">
-              <div class="form-check" >
+            <div class="col-sm" *ngFor="let dataset of activityDatasets">
+              <div class="form-check">
                 <label class="form-check-label">
                   <input type="radio" class="form-check-input" name="optionsRadios" id="{{dataset.displayName}}"
-                    value="{{dataset.displayName}}" (click)="selectDataset(dataset)">
+                    value="{{dataset.displayName}}" (click)="selectDataset('activity', dataset)">
                   {{dataset.displayName}}
                 </label>
               </div>
@@ -22,10 +27,34 @@
           </div>
         </fieldset>
       </form>
+
+      <p>
+        <button type="button" class="btn btn-primary" (click)="showSleepRadioButtons()">Add Sleep</button>
+      </p>
+
+      <form>
+        <fieldset class="form-group" *ngIf="showSleepDatasets">
+          <legend>Sleep Datasets</legend>
+          <div class="row">
+            <div class="col-sm" *ngFor="let dataset of sleepDatasets">
+              <div class="form-check">
+                <label class="form-check-label">
+                  <input type="radio" class="form-check-input" name="optionsRadios" id="{{dataset.displayName}}"
+                    value="{{dataset.displayName}}" (click)="selectDataset('sleep', dataset)">
+                  {{dataset.displayName}}
+                </label>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+
     </div>
   </div>
 </div>
 
-
-
-<div id="chartContainer" style="height: 370px; width: 75%; margin-left:auto;margin-right:auto;"></div>
+<div class="row">
+  <div class="col">
+    <div id="chartContainer"></div>
+  </div>
+</div>

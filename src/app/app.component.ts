@@ -8,5 +8,5 @@ import { HealthDataService } from './services/health-data.service';
   providers: [HealthDataService]
 })
 export class AppComponent {
-  title = 'My Health Patterns';
+  title = 'Health Insights';
 }
