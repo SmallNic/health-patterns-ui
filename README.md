@@ -18,7 +18,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 ###  Clone the repo
 
 ```
-git clone 
+git clone https://github.com/SmallNic/health-patterns-ui.git
 cd health-patterns-ui
 ```
 
