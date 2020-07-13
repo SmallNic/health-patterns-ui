@@ -1,4 +1,4 @@
-# Health Insights
+# Health Insights UI
 
 Health Insights is a front-end application that consumes Fitbit-tracked health data from a locally served API (for now) and graphs that data. Data may be layered on top of each other so that insights into health patterns can be discovered.
 

@@ -9,8 +9,9 @@ import * as CanvasJS from '../canvasjs.min.js';
 })
 export class HomeComponent implements OnInit {
 
-  public fetchedActivityData: any[];
-  public activityDatasets: any[] = [
+  public datasetOptionsVisibility = {};
+
+  public activityDatasets: object[] = [
     {
       displayName: 'Steps',
       apiName: 'steps',
@@ -30,53 +31,127 @@ export class HomeComponent implements OnInit {
       yAxis: 'Miles'
     }
   ];
-  public activityDataPoints: any[] = [];
-
-  public fetchedSleepData: any[];
-  public sleepDatasets: any[] = [
+  public sleepDatasets: object[] = [
     {
-      displayName: 'Minutes Asleep',
+      displayName: 'Minutes In Bed',
+      apiName: 'time_in_bed',
+      xAxis: 'start_time',
+      yAxis: 'Minutes'
+    },
+    {
+      displayName: 'Minutes Awake',
       apiName: 'minutes_asleep',
       xAxis: 'start_time',
       yAxis: 'Minutes'
+    },
+    {
+      displayName: 'Minutes in REM',
+      apiName: 'minutes_rem',
+      xAxis: 'start_time',
+      yAxis: 'Minutes'
+    },
+    {
+      displayName: 'Minutes in Light Sleep',
+      apiName: 'minutes_light',
+      xAxis: 'start_time',
+      yAxis: 'Minutes'
+    },
+    {
+      displayName: 'Minutes in Deep Sleep',
+      apiName: 'minutes_deep',
+      xAxis: 'start_time',
+      yAxis: 'Minutes'
+    },
+  ];
+  public dietDatasets: object[] = [
+    {
+      displayName: 'Calories In',
+      apiName: 'calories_in',
+      xAxis: 'date',
+      yAxis: 'Calories'
     }
   ];
-  public sleepDataPoints: any[] = [];
-  public showSleepDatasets = false;
+  public mindfulnessDatasets: object[] = [
+    {
+      displayName: 'Mindfulness Minutes',
+      apiName: 'mindfulness_minutes',
+      xAxis: 'date',
+      yAxis: 'Minutes'
+    }
+  ];
+
+  public months = ['January', 'February', 'March', 'April', 'May', 'June'];
+
+  public chosenDatasets: any[] = [];
+  public chosenTimeframe: any;
+
+  public fetchedActivityData: any[];
+  public fetchedSleepData: any[];
+  public fetchedDietData: any[];
+  public fetchedMindfulnessData: any[];
+
+  public activityDataPoints: object[] = [];
+  public sleepDataPoints: object[] = [];
 
   public chart: any;
-  public chartTitles = [];
+  public chartTitles: string[] = [];
 
-  constructor(private healthDataService: HealthDataService) {
-  }
+  constructor(private healthDataService: HealthDataService) { }
 
   ngOnInit(): void {
-    this.fetchActivityData();
     this.renderInitialChart();
   }
 
-  private fetchActivityData = () => {
-    this.healthDataService.getActivityData()
-      .subscribe(results => {
-        this.fetchedActivityData = results.sort((a, b) => {
-          return a.date < b.date ? -1 : a.date > b.date ? 1 : 0;
-        });
-      }
-    );
+  public toggleDatasetOptions = (dataset: string): void => {
+    this.datasetOptionsVisibility[dataset] = !this.datasetOptionsVisibility[dataset];
   }
 
-  private fetchSleepData = () => {
-    this.healthDataService.getSleepData()
-      .subscribe(results => {
-        this.fetchedSleepData = results.sort((a, b) => {
-          return a.start_time < b.start_time ? -1 : a.start_time > b.start_time ? 1 : 0;
-        });
+  public selectDataset = (dataType: string, dataset: any): void => {
+    let added = false;
+    this.chosenDatasets.forEach(chosen => {
+      if (chosen.dataType === dataType) {
+        chosen.dataset = dataset;
+        added = true;
       }
-    );
+    });
+    if (!added) {
+      this.chosenDatasets.push({ dataType, dataset });
+    }
   }
 
-  private renderInitialChart = () => {
+  public selectTimeframe = (year: string, month: string): void => {
+    this.chosenTimeframe = { year, month };
+  }
+
+  public fetchAndPlotData = (): void => {
+    this.chosenDatasets.forEach(chosenDataset => {
+      if (chosenDataset.dataType === 'activity') {
+        this.healthDataService.getActivityData(this.chosenTimeframe.month)
+          .subscribe(results => {
+            this.fetchedActivityData = results.sort((a, b) => {
+              return a.date < b.date ? -1 : a.date > b.date ? 1 : 0;
+            });
+            this.renderActivityData(chosenDataset.dataset);
+          });
+      }
+      else if (chosenDataset.dataType === 'sleep') {
+        this.healthDataService.getSleepData(this.chosenTimeframe.month)
+          .subscribe(results => {
+            this.fetchedSleepData = results.sort((a, b) => {
+              return a.start_time < b.start_time ? -1 : a.start_time > b.start_time ? 1 : 0;
+            });
+            this.renderSleepData(chosenDataset.dataset);
+          });
+      }
+    });
+  }
+
+
+  //////////////////////////////////// CanvasJS Functions ////////////////////////////////////
+
+  private renderInitialChart = (): void => {
     this.chart = new CanvasJS.Chart('chartContainer', {
+      backgroundColor: '#e9ecef',
       animationEnabled: true,
       showInLegend: true,
       legend: {
@@ -91,17 +166,13 @@ export class HomeComponent implements OnInit {
       },
       data: [{
         type: 'column',
-        dataPoints: [{y: 0}]
+        dataPoints: [{ y: 0 }]
       }]
     });
     this.chart.render();
   }
 
-  public selectDataset = (dataType: string, dataset: any) => {
-    dataType === 'activity' ? this.renderActivityData(dataset) : this.renderSleepData(dataset);
-  }
-
-  private renderActivityData = (dataset: any) => {
+  private renderActivityData = (dataset: any): void => {
     this.activityDataPoints = this.fetchedActivityData.map(activity => {
       return {
         y: activity[dataset.apiName],
@@ -123,7 +194,7 @@ export class HomeComponent implements OnInit {
     this.chart.render();
   }
 
-  private renderSleepData = (dataset: any) => {
+  private renderSleepData = (dataset: any): void => {
     this.sleepDataPoints = [];
     this.fetchedSleepData.forEach(sleep => {
       // Skipping naps
@@ -150,17 +221,7 @@ export class HomeComponent implements OnInit {
     this.chart.render();
   }
 
-  public showSleepRadioButtons = () => {
-    if (!this.fetchedSleepData) {
-      this.fetchSleepData();
-      this.showSleepDatasets = true;
-
-    }
-  }
-
-  //////////////////////////////////// CanvasJS Formatting Functions ////////////////////////////////////
-
-  private formatYAxis = (title: string) => {
+  private formatYAxis = (title: string): object => {
     return {
       title,
       includeZero: false,
@@ -168,7 +229,7 @@ export class HomeComponent implements OnInit {
     };
   }
 
-  private getChartTitle = () => {
+  private getChartTitle = (): string => {
     if (this.chartTitles.length === 1) {
       return this.chartTitles[0];
     } else if (this.chartTitles.length > 1 && this.chartTitles[0]) {
@@ -180,7 +241,7 @@ export class HomeComponent implements OnInit {
 
   //////////////////////////////////// Utility Functions ////////////////////////////////////
 
-  private convertDate = (date) => {
+  private convertDate = (date): string => {
     const d = new Date(date);
     return d.toISOString().substring(0, 10);
   }
